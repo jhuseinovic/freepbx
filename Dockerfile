@@ -80,21 +80,24 @@ RUN curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key
     apt-get install -y nodejs yarn cron gettext libicu-dev pkg-config
 
 # FreePBX
-RUN mysql.server start && \
-    cd /usr/src/freepbx && \
+RUN mysql.server start
+
+RUN cd /usr/src/freepbx && \
     echo "Starting Asterisk..." && \
     cp /etc/odbc.ini /usr/src/freepbx/installlib/files/odbc.ini && \
-    ./start_asterisk start && \
-    sleep 3 && \
+    ./start_asterisk start
+
+RUN sleep 3 && \
     echo "Installing FreePBX..." && \
-    ./install -n && \
-    echo "Updating FreePBX modules..." && \
+    ./install -n
+    
+RUN echo "Updating FreePBX modules..." && \
     fwconsole chown && \
     fwconsole ma upgradeall && \
     fwconsole ma downloadinstall backup bulkhandler ringgroups timeconditions ivr restapi cel configedit asteriskinfo certman ucp webrtc && \
-    # mysqldump -uroot -d -A -B --skip-add-drop-table > /mysql-freepbx.sql && \
-    /etc/init.d/mysql stop && \
-    gpg --refresh-keys --keyserver hkp://keyserver.ubuntu.com:80 && \
+    mysql.server stop
+
+RUN gpg --refresh-keys --keyserver hkp://keyserver.ubuntu.com:80 && \
     gpg --import /var/www/html/admin/libraries/BMO/9F9169F4B33B4659.key && \
     gpg --import /var/www/html/admin/libraries/BMO/3DDB2122FE6D84F7.key && \
     gpg --import /var/www/html/admin/libraries/BMO/86CE877469D2EAD9.key && \
