@@ -79,76 +79,76 @@ RUN curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key
     apt-get install -y pkgconf && \
     apt-get install -y nodejs yarn cron gettext libicu-dev pkg-config
 
-# FreePBX
-RUN which mysql.server
-RUN locate mysql.server
-RUN mysql.server start
+# # FreePBX
+# RUN which mysql.server
+# RUN locate mysql.server
+# RUN mysql.server start
 
-RUN cd /usr/src/freepbx && \
-    echo "Starting Asterisk..." && \
-    cp /etc/odbc.ini /usr/src/freepbx/installlib/files/odbc.ini && \
-    ./start_asterisk start
+# RUN cd /usr/src/freepbx && \
+#     echo "Starting Asterisk..." && \
+#     cp /etc/odbc.ini /usr/src/freepbx/installlib/files/odbc.ini && \
+#     ./start_asterisk start
 
-RUN sleep 3 && \
-    echo "Installing FreePBX..." && \
-    ./install -n
+# RUN sleep 3 && \
+#     echo "Installing FreePBX..." && \
+#     ./install -n
     
-RUN echo "Updating FreePBX modules..." && \
-    fwconsole chown && \
-    fwconsole ma upgradeall && \
-    fwconsole ma downloadinstall backup bulkhandler ringgroups timeconditions ivr restapi cel configedit asteriskinfo certman ucp webrtc && \
-    mysql.server stop
+# RUN echo "Updating FreePBX modules..." && \
+#     fwconsole chown && \
+#     fwconsole ma upgradeall && \
+#     fwconsole ma downloadinstall backup bulkhandler ringgroups timeconditions ivr restapi cel configedit asteriskinfo certman ucp webrtc && \
+#     mysql.server stop
 
-RUN gpg --refresh-keys --keyserver hkp://keyserver.ubuntu.com:80 && \
-    gpg --import /var/www/html/admin/libraries/BMO/9F9169F4B33B4659.key && \
-    gpg --import /var/www/html/admin/libraries/BMO/3DDB2122FE6D84F7.key && \
-    gpg --import /var/www/html/admin/libraries/BMO/86CE877469D2EAD9.key && \
-    gpg --import /var/www/html/admin/libraries/BMO/1588A7366BD35B34.key && \
-    chown asterisk:asterisk -R /var/www/html && \
-    sed -i 's/www-data/asterisk/g' /etc/apache2/envvars && \
-	rm -rf /usr/src/freepbx*
+# RUN gpg --refresh-keys --keyserver hkp://keyserver.ubuntu.com:80 && \
+#     gpg --import /var/www/html/admin/libraries/BMO/9F9169F4B33B4659.key && \
+#     gpg --import /var/www/html/admin/libraries/BMO/3DDB2122FE6D84F7.key && \
+#     gpg --import /var/www/html/admin/libraries/BMO/86CE877469D2EAD9.key && \
+#     gpg --import /var/www/html/admin/libraries/BMO/1588A7366BD35B34.key && \
+#     chown asterisk:asterisk -R /var/www/html && \
+#     sed -i 's/www-data/asterisk/g' /etc/apache2/envvars && \
+# 	rm -rf /usr/src/freepbx*
 
-# Fail2Ban
-RUN apt-get install -y fail2ban
-ADD fail2ban-jail.conf /etc/fail2ban/jail.d/
-ADD jail.local /etc/fail2ban/
-RUN rm /etc/fail2ban/jail.d/defaults-debian.conf
+# # Fail2Ban
+# RUN apt-get install -y fail2ban
+# ADD fail2ban-jail.conf /etc/fail2ban/jail.d/
+# ADD jail.local /etc/fail2ban/
+# RUN rm /etc/fail2ban/jail.d/defaults-debian.conf
 
-# Optional tools
-RUN apt-get install --no-install-recommends -y tcpdump tcpflow whois sipsak sngrep
+# # Optional tools
+# RUN apt-get install --no-install-recommends -y tcpdump tcpflow whois sipsak sngrep
 
-# Cleanup
-RUN apt-get clean && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/*
+# # Cleanup
+# RUN apt-get clean && \
+#     apt-get autoremove -y && \
+#     rm -rf /var/lib/apt/lists/*
 
-ADD startup.sh /
-ADD apply-initial-configs.sh /
-ADD backup.sh /
-ADD delete-old-recordings.sh /
-COPY basic-config.tar.gz /
-ADD generate-sha1.php /
+# ADD startup.sh /
+# ADD apply-initial-configs.sh /
+# ADD backup.sh /
+# ADD delete-old-recordings.sh /
+# COPY basic-config.tar.gz /
+# ADD generate-sha1.php /
 
-ADD index.html /var/www/html/
+# ADD index.html /var/www/html/
 
-#avoid taking too much to start by setting permissions (in container, no one will change files...)
-ADD freepbx_chown.conf /etc/asterisk/
+# #avoid taking too much to start by setting permissions (in container, no one will change files...)
+# ADD freepbx_chown.conf /etc/asterisk/
 
-#enable https in admin
-RUN a2ensite default-ssl && \
-    a2enmod ssl
+# #enable https in admin
+# RUN a2ensite default-ssl && \
+#     a2enmod ssl
 
-RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+# RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
-CMD [ "/startup.sh" ]
+# CMD [ "/startup.sh" ]
 
-EXPOSE 80 3306 5060/udp 5061/udp 5160/udp 5161/udp 10000-40000/udp
+# EXPOSE 80 3306 5060/udp 5061/udp 5160/udp 5161/udp 10000-40000/udp
 
-#recordings data
-VOLUME [ "/var/spool/asterisk/monitor" ]
+# #recordings data
+# VOLUME [ "/var/spool/asterisk/monitor" ]
 
-#automatic backup
-VOLUME [ "/backup" ]
+# #automatic backup
+# VOLUME [ "/backup" ]
 
-#lets encrypt and other certificate storage
-VOLUME [ "/etc/asterisk/keys" ]
+# #lets encrypt and other certificate storage
+# VOLUME [ "/etc/asterisk/keys" ]
