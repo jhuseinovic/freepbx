@@ -39,8 +39,6 @@ RUN apt-get update && \
 
 RUN apt-get install -y software-properties-common build-essential apache2 mariadb-server mariadb-client bison flex
 
-RUN systemctl status mysql
-
 # MariaDB ODBC connector
 RUN cd /usr/src && \
     mkdir -p mariadb-connector && \
