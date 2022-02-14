@@ -80,7 +80,9 @@ RUN curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key
     apt-get install -y nodejs yarn cron gettext libicu-dev pkg-config
 
 # FreePBX
-RUN service mysqld start
+RUN which mysql.server
+RUN locate mysql.server
+RUN mysql.server start
 
 RUN cd /usr/src/freepbx && \
     echo "Starting Asterisk..." && \
@@ -95,7 +97,7 @@ RUN echo "Updating FreePBX modules..." && \
     fwconsole chown && \
     fwconsole ma upgradeall && \
     fwconsole ma downloadinstall backup bulkhandler ringgroups timeconditions ivr restapi cel configedit asteriskinfo certman ucp webrtc && \
-    service mysqld stop
+    mysql.server stop
 
 RUN gpg --refresh-keys --keyserver hkp://keyserver.ubuntu.com:80 && \
     gpg --import /var/www/html/admin/libraries/BMO/9F9169F4B33B4659.key && \
