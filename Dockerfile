@@ -87,9 +87,9 @@ RUN cd /usr/src/freepbx && \
     cp /etc/odbc.ini /usr/src/freepbx/installlib/files/odbc.ini && \
     ./start_asterisk start
 
-RUN sleep 3 && \
-    echo "Installing FreePBX..." && \
-    ./install -n
+# RUN sleep 3 && \
+#     echo "Installing FreePBX..." && \
+#     ./install -n
     
 RUN echo "Updating FreePBX modules..." && \
     fwconsole chown && \
