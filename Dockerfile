@@ -37,7 +37,9 @@ RUN apt-get update && \
     apt-get update  && \
     apt-get -o Dpkg::Options::="--force-confold" upgrade -y
 
-RUN apt-get install -y build-essential apache2 mariadb-server mariadb-client bison flex
+RUN apt-get install -y software-properties-common build-essential apache2 mariadb-server mariadb-client bison flex
+
+RUN systemctl status mysql
 
 # MariaDB ODBC connector
 RUN cd /usr/src && \
@@ -80,7 +82,7 @@ RUN curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key
     apt-get install -y nodejs yarn cron gettext libicu-dev pkg-config
 
 # FreePBX
-RUN /etc/init.d/mysqld start
+RUN /lib/systemd/system/mysql.service start
 
 RUN cd /usr/src/freepbx && \
     echo "Starting Asterisk..." && \
@@ -95,7 +97,7 @@ RUN echo "Updating FreePBX modules..." && \
     fwconsole chown && \
     fwconsole ma upgradeall && \
     fwconsole ma downloadinstall backup bulkhandler ringgroups timeconditions ivr restapi cel configedit asteriskinfo certman ucp webrtc && \
-    /etc/init.d/mysqld stop
+    /lib/systemd/system/mysql.service stop
 
 RUN gpg --refresh-keys --keyserver hkp://keyserver.ubuntu.com:80 && \
     gpg --import /var/www/html/admin/libraries/BMO/9F9169F4B33B4659.key && \
